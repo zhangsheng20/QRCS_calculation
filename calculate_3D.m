@@ -3,7 +3,7 @@
 
 function calculate_3D
 %cope for code.m
-filename='.\cube_1m_1m_0.03m_.dat';
+%filename='.\cube_1m_1m_0.03m_.dat';
 %filename='Cylinder-r-0.5-l-0.1-grid-0.025.dat';
 %filename='sphere-r-0.5-grid-0.025.dat';
 %filename='Cylinder-r-1-l-0.5-grid-0.1.dat';
