@@ -5,9 +5,11 @@ function calculate_3D
 %cope for code.m
 %filename='.\cube_1m_1m_0.03m_.dat';
 %filename='Cylinder-r-0.5-l-0.1-grid-0.025.dat';
-filename='sphere-r-0.5-grid-0.025.dat';
-% filename='cube-l-1-w-1-grid-0.05.dat';
+%  filename='sphere-r-0.5-grid-0.01.dat';
+% filename='sphere-r-1-grid-0.1.dat';
+% filename='cube-l-1-w-1-grid-0.03.dat';
 %filename='Cylinder-r-0.3-l-0.5-grid-0.03.dat';
+filename='sphere-r-0.5-grid-0.025.dat'
 partfile={filename};
 
 %% 有几个变量其他函数计算的时候要用，声明为全局变量
@@ -117,19 +119,21 @@ zlabel('z');
 
 %% draw picture
 
-l_theta=-pi/2:0.01:pi/2;
+l_theta=0:0.01:pi/2;
 l_sigma_Q_1=zeros(size(l_theta));
 
 ii=0;
 
 for theta= l_theta
     ii=ii+1;
-%     A=calc_A_3D(theta,0);
-A=1*cos(theta);
+    A=calc_A_3D(theta,0);
+
     G=calc_G_3D(theta,0);
     fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
                       ii,length(l_theta),A,G,G/A^2,G/A);
-    l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_3D_N_I_s_2(theta,0,theta,0)/G);
+    N_I_s= calc_3D_N_I_s_2(theta,0,theta,0);        
+    l_sigma_Q_1(ii)=20*log10(4*pi*A*N_I_s/G);
+    fprintf('N_I_s:%f  \n',N_I_s)
     %l_sigma_Q_1(ii)=20*log10(calc_3D_N_I_s_2(theta,0,theta,0));
 end
 figure(2);
@@ -173,7 +177,7 @@ end
 
 a=fn*r_s'/r;
 b=fn*r_d'/r;
-mask=(a>0) &  (b>0);     %& fn(:,3)>0.5;
+mask=(a>0.08) &  (b>0.08);     %& fn(:,3)>0.5;
 d=exp(1.00000i*omega*Mat_Delta_Ri/c).*fA.*mask;
 allsum=sum(d);
 output=(abs(allsum)).^2;
@@ -212,14 +216,12 @@ r=100000000*lambda;
 r_s=[r*sin(theta_s)*cos(phi_s),r*sin(theta_s)*sin(phi_s),r*cos(theta_s)];
 global fn;
 global fA;
-global nf;
-sum_A_i=0;
-for ii=1:1:nf
-    if (dot(r_s,fn(ii,:))/r>0)%被照射到的光子
-        sum_A_i=sum_A_i+fA(ii)*dot(r_s,fn(ii,:))/r;
-    end  
-end
-A=sum_A_i;
+
+a=fn*r_s';
+mask=a>0;
+Mat_sum=mask.*fA.*a/r;
+A=sum(Mat_sum);
+
 
 end
 
