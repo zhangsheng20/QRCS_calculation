@@ -1,8 +1,18 @@
 
 function test_code
-test007();
+test006();
 end
 
+%%  理论解和数值解图像
+function test003
+test004();
+hold on
+test005('circle');
+legend('数值解','理论解','Location','northeast')
+hold on
+% ylim([-5, 5]);
+grid on
+end
 
 %% 求均值 (球体)
 function test007
@@ -36,7 +46,10 @@ end
 function test006
 % load('cube-l-1-w-1-grid-0.05.mat')
 %  load('Cylinder-r-1-l-0.5-grid-0.1.mat')
- load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat')
+%load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat')
+% load('Cylinder-r-1-l-0.1-grid-0.03.mat')
+% load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
+load('cube-l-1-w-1-grid-0.03.mat')
 l_sigma_Q_2=zeros(size(l_theta));
 
 ii=1;
@@ -48,7 +61,7 @@ for theta=l_theta
     else
         
        l_sigma_Q_1(ii)=10^(l_sigma_Q_1(ii)/20);
-       l_sigma_Q_2(ii)=calc_sigma_Q(theta,'triangle');
+       l_sigma_Q_2(ii)=calc_sigma_Q(theta,'rect');
        ii=ii+1; 
     end
 end
@@ -61,16 +74,7 @@ value_mean=mean(d)
 
 end
 
-%% 球体理论解和数值解图像
-function test003
-test004();
-hold on
-test001();
-legend('数值解','理论解','Location','northeast')
-hold on
-ylim([-5, 5]);
-grid on
-end
+
 
 
 %% 绘制理论解图像
@@ -83,21 +87,22 @@ for theta= l_theta
     ii=ii+1;
     l_sigma_Q_1(ii)=20*log10(calc_sigma_Q(theta,shape));
 end
-figure(2);
 plot(l_theta,l_sigma_Q_1,'-*')
 xlabel('\theta(rad)');
-ylabel('\sigma_Q(dB/m^2)');  
+ylabel('QRCS(dB/m^2)');  
 legend('理论解','Location','northeast')
 end
 
-%% 绘制圆盘数值解
+%% 绘制 数值解
 function test004
-% load('cube-l-1-w-1-grid-0.05.mat')
-% load('Cylinder-r-1-l-0.5-grid-0.1.mat')
-% load('sphere-r-0.5-grid-0.025.mat')
-% load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat')
-% load('cube-l-1-w-1-grid-0.05.mat')
-load('sphere-r-0.5-grid-0.025.mat')
+% load('cube-l-1-w-1-grid-0.05.mat');
+% load('Cylinder-r-1-l-0.5-grid-0.1.mat');
+% load('sphere-r-0.5-grid-0.025.mat');
+% load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat');
+% load('cube-l-1-w-1-grid-0.05.mat');
+% load('sphere-r-0.5-grid-0.025.mat');
+%  load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
+load('Cylinder-r-1-l-0.1-grid-0.03.mat')
 plot(l_theta,l_sigma_Q_1,'-*')
 xlabel('\theta(rad)');
 ylabel('QRCS(dB/m^2)'); 
