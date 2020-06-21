@@ -5,8 +5,8 @@ function calculate_3D
 %cope for code.m
 %filename='.\cube_1m_1m_0.03m_.dat';
 %filename='Cylinder-r-0.5-l-0.1-grid-0.025.dat';
-%filename='sphere-r-0.5-grid-0.025.dat';
-%filename='Cylinder-r-1-l-0.5-grid-0.1.dat';
+filename='sphere-r-0.5-grid-0.025.dat';
+% filename='cube-l-1-w-1-grid-0.05.dat';
 %filename='Cylinder-r-0.3-l-0.5-grid-0.03.dat';
 partfile={filename};
 
@@ -117,13 +117,15 @@ zlabel('z');
 
 %% draw picture
 
-l_theta=0:0.01:pi/2;
+l_theta=-pi/2:0.01:pi/2;
 l_sigma_Q_1=zeros(size(l_theta));
 
 ii=0;
+
 for theta= l_theta
     ii=ii+1;
-    A=calc_A_3D(theta,0);
+%     A=calc_A_3D(theta,0);
+A=1*cos(theta);
     G=calc_G_3D(theta,0);
     fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
                       ii,length(l_theta),A,G,G/A^2,G/A);
@@ -171,7 +173,7 @@ end
 
 a=fn*r_s'/r;
 b=fn*r_d'/r;
-mask=(a>0.01) &  (b>0.01) ;
+mask=(a>0) &  (b>0);     %& fn(:,3)>0.5;
 d=exp(1.00000i*omega*Mat_Delta_Ri/c).*fA.*mask;
 allsum=sum(d);
 output=(abs(allsum)).^2;
