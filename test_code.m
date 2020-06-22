@@ -1,7 +1,34 @@
 
 function test_code
-test006();
+test008();
 end
+
+
+%%  二面角数值解
+function test008
+
+if ~exist('dihedral.mat')
+    l_theta=0:0.1:pi/2;
+    l_sigma_Q_1=zeros(size(l_theta));
+
+    ii=1;
+    for theta= l_theta
+        A=1*sqrt(2)*cos(theta-pi/4);
+        G=calc_G(theta,0,'dihedral');
+        l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,0,'dihedral')/G);
+        fprintf('%d\\%d   G:%f\n',ii,length(l_theta),1);
+        ii=ii+1;
+    end
+else
+   load('dihedral.mat') 
+end
+
+plot(l_theta,l_sigma_Q_1,'-*');
+% ylim([-5, 5]);
+grid on
+save('dihedral','l_theta','l_sigma_Q_1');
+end
+
 
 %%  理论解和数值解图像
 function test003
@@ -21,56 +48,69 @@ function test007
 %  load('sphere-r-0.5-grid-0.01.mat')
 l_sigma_Q_2=zeros(size(l_theta));
 
+
+
 ii=1;
 for theta=l_theta
-    if isnan(l_sigma_Q_1(ii))
-        l_sigma_Q_1(ii)=[];
-        l_sigma_Q_2(ii)=[];
-        l_theta(ii)=[];
-    else     
-       l_sigma_Q_1(ii)=10^(l_sigma_Q_1(ii)/20);
-       l_sigma_Q_2(ii)=pi*0.25;
-       ii=ii+1; 
-    end
+     sigma_Q_1(ii)=10^(l_sigma_Q_1(ii)/20);
+     sigma_Q_2(ii)=pi*0.25;
+      ii=ii+1; 
 end
- plot(l_theta,(l_sigma_Q_1),'-*',l_theta,(l_sigma_Q_2),'-*')
-d=l_sigma_Q_2-l_sigma_Q_1;
-figure(2);
-plot(l_theta,d);
-value_mean=mean(d)
-20*log10(abs(value_mean))
+
+ii=1;
+for theta=l_theta
+    if isnan(sigma_Q_1(ii)) || isnan(sigma_Q_2(ii))
+        sigma_Q_1(ii)=[];
+        sigma_Q_2(ii)=[];
+        l_theta(ii)=[]; 
+    else
+        ii=ii+1; 
+    end    
+end
+
+
+ plot(l_theta,20*log10(sigma_Q_1),'-*',l_theta,20*log10(sigma_Q_2),'-*');
+ value_mean1=mean(sigma_Q_1);
+ fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  20*log10(abs(value_mean1))  );
+ value_mean2=mean(sigma_Q_2);
+ fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  20*log10(abs(value_mean2))  );
+ fprintf('均值差：%f dB \n',20*log10(abs(value_mean1))-20*log10(abs(value_mean2)));
 
 end
 
 %% 求均值
 function test006
-% load('cube-l-1-w-1-grid-0.05.mat')
-%  load('Cylinder-r-1-l-0.5-grid-0.1.mat')
-%load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat')
+%  load('cube-l-1-w-1-grid-0.05.mat')
 % load('Cylinder-r-1-l-0.1-grid-0.03.mat')
-% load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
-load('cube-l-1-w-1-grid-0.03.mat')
-l_sigma_Q_2=zeros(size(l_theta));
+load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
+
+sigma_Q_1=zeros(size(l_theta));
+sigma_Q_2=zeros(size(l_theta));
 
 ii=1;
 for theta=l_theta
-    if isnan(l_sigma_Q_1(ii))
-        l_sigma_Q_1(ii)=[];
-        l_sigma_Q_2(ii)=[];
-        l_theta(ii)=[];
-    else
-        
-       l_sigma_Q_1(ii)=10^(l_sigma_Q_1(ii)/20);
-       l_sigma_Q_2(ii)=calc_sigma_Q(theta,'rect');
-       ii=ii+1; 
-    end
+     sigma_Q_1(ii)=10^(l_sigma_Q_1(ii)/20);
+     sigma_Q_2(ii)=calc_sigma_Q(theta,'triangle');
+      ii=ii+1; 
 end
- plot(l_theta,20*log10(l_sigma_Q_1),'-*',l_theta,20*log10(l_sigma_Q_2),'-*')
-d=l_sigma_Q_2-l_sigma_Q_1;
-figure(2);
-plot(l_theta,d);
-value_mean=mean(d)
-20*log10(abs(value_mean))
+
+ii=1;
+for theta=l_theta
+    if isnan(sigma_Q_1(ii)) || isnan(sigma_Q_2(ii))
+        sigma_Q_1(ii)=[];
+        sigma_Q_2(ii)=[];
+        l_theta(ii)=[]; 
+    else
+        ii=ii+1; 
+    end    
+end
+ plot(l_theta,20*log10(sigma_Q_1),'-*',l_theta,20*log10(sigma_Q_2),'-*');
+ value_mean1=mean(sigma_Q_1);
+ fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  20*log10(abs(value_mean1))  );
+ 
+ value_mean2=mean(sigma_Q_2);
+ fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  20*log10(abs(value_mean2))  );
+ fprintf('均值差：%f dB \n',20*log10(abs(value_mean1))-20*log10(abs(value_mean2)));
 
 end
 

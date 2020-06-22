@@ -11,7 +11,8 @@ function calculate_3D
 %filename='Cylinder-r-0.3-l-0.5-grid-0.03.dat';
 % filename='sphere-r-0.5-grid-0.025.dat'
 % filename='TriangularPrism-d-1-h-1-l-0.2-grid-0.025.dat';
-filename='Cylinder-r-1-l-0.1-grid-0.03.dat';
+%filename='Cylinder-r-1-l-0.1-grid-0.03.dat';
+filename='dihedral-a-1-b-1-grid-0.03.dat';
 partfile={filename};
 
 %% 有几个变量其他函数计算的时候要用，声明为全局变量
@@ -121,7 +122,7 @@ zlabel('z');
 
 %% draw picture
 
-l_theta=-pi/2:0.01:pi/2;
+l_theta=0:0.01:pi/2;
 l_sigma_Q_1=zeros(size(l_theta));
 
 ii=0;
@@ -179,7 +180,7 @@ end
 
 a=fn*r_s'/r;
 b=fn*r_d'/r;
-mask=(a>0.08) &  (b>0.08) & fn(:,3)>0.5;
+mask=(a>0.08) &  (b>0.08); %& fn(:,3)>0.5;
 d=exp(1.00000i*omega*Mat_Delta_Ri/c).*fA.*mask;
 allsum=sum(d);
 output=(abs(allsum)).^2;
