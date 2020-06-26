@@ -1,32 +1,69 @@
 
 function test_code
-test008();
+test004();
 end
+
+%%  随phi的变化  二面角数值解
+function test009
+
+if ~exist('dihedral.mat')
+    l_phi=-pi/2:0.1:pi/2;
+    l_sigma_Q_1=zeros(size(l_phi));
+    l_sigma_Q_2=zeros(size(l_phi));
+    
+    ii=1;
+    theta=2*pi/3;
+    for phi= l_phi
+        A=1*sqrt(2)*cos(theta-pi/2);
+%         G=calc_G(theta,phi,'dihedral');
+        G=1;
+%         l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,phi,'dihedral',theta,phi)/G);
+        l_sigma_Q_2(ii)=G;
+        l_sigma_Q_1(ii)=20*log10(calc_N_I_s(theta,phi,'dihedral',theta,phi));
+        fprintf('%d\\%d   G:%f\n',ii,length(l_phi),G);
+        ii=ii+1;
+    end
+else
+    load('dihedral.mat')
+end
+
+plot(l_phi,l_sigma_Q_1,'-*');
+% ylim([-5, 5]);
+grid on
+% save('dihedral','l_theta','l_sigma_Q_1','l_sigma_Q_2');
+end
+
 
 
 %%  二面角数值解
 function test008
 
 if ~exist('dihedral.mat')
-    l_theta=0:0.1:pi/2;
+    l_theta=pi/4:0.01:3*pi/4;
+%     l_theta=0:0.1:pi/2;
     l_sigma_Q_1=zeros(size(l_theta));
-
+    
     ii=1;
     for theta= l_theta
-        A=1*sqrt(2)*cos(theta-pi/4);
-        G=calc_G(theta,0,'dihedral');
-        l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,0,'dihedral')/G);
-        fprintf('%d\\%d   G:%f\n',ii,length(l_theta),1);
+        A=1*sqrt(2)*cos(theta-pi/2);
+%         G=calc_G(theta,0,'dihedral');
+        G=1;
+%         l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,0,'dihedral',theta,0)/G);
+%         l_sigma_Q_1(ii)=G;
+        l_sigma_Q_1(ii)=20*log10(calc_N_I_s(theta,0,'dihedral',theta,0))-170;
+        fprintf('%d\\%d   G:%f\n',ii,length(l_theta),G);
         ii=ii+1;
     end
 else
-   load('dihedral.mat') 
+    load('dihedral.mat')
 end
 
 plot(l_theta,l_sigma_Q_1,'-*');
-% ylim([-5, 5]);
+%  ylim([5, 15]);
+ xlabel('\theta(rad)');
+ ylabel('QRCS(dB/m^2)');  
 grid on
-save('dihedral','l_theta','l_sigma_Q_1');
+% save('dihedral','l_theta','l_sigma_Q_1','l_sigma_Q_2');
 end
 
 
@@ -142,7 +179,9 @@ function test004
 % load('cube-l-1-w-1-grid-0.05.mat');
 % load('sphere-r-0.5-grid-0.025.mat');
 %  load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
-load('Cylinder-r-1-l-0.1-grid-0.03.mat')
+% load('Cylinder-r-1-l-0.1-grid-0.03.mat')
+load('cube-l-0.5-w-0.5-grid-0.05.mat')
+
 plot(l_theta,l_sigma_Q_1,'-*')
 xlabel('\theta(rad)');
 ylabel('QRCS(dB/m^2)'); 

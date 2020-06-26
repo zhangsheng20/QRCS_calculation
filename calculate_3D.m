@@ -12,7 +12,8 @@ function calculate_3D
 % filename='sphere-r-0.5-grid-0.025.dat'
 % filename='TriangularPrism-d-1-h-1-l-0.2-grid-0.025.dat';
 %filename='Cylinder-r-1-l-0.1-grid-0.03.dat';
-filename='dihedral-a-1-b-1-grid-0.03.dat';
+% filename='dihedral-a-1-b-1-grid-0.03.dat';
+filename='cube-l-0.5-w-0.5-grid-0.05.dat';
 partfile={filename};
 
 %% 有几个变量其他函数计算的时候要用，声明为全局变量
@@ -224,7 +225,6 @@ a=fn*r_s';
 mask=a>0;
 Mat_sum=mask.*fA.*a/r;
 A=sum(Mat_sum);
-
 
 end
 
