@@ -1,11 +1,29 @@
+function calculate_3D(filename,step,theta_begin,theta_end,phi_begin,phi_end,fileformat)
+global Is_plot;
+global nf;
+global fr0;
+global fn;
+global fA;
+global c;
+global lambda;
+global vertex;
+global mNumber;
 
+c=3.0e+8;
+lambda=0.25;
+Is_plot=1;
+step=0.1;
+theta_begin=pi/2;
+theta_end=pi/2;
+phi_begin=-pi/2;
+phi_end=pi/2;
+% fileformat='catia';
+fileformat='gridpro';
 
-
-function calculate_3D
 %cope for code.m
 %filename='.\cube_1m_1m_0.03m_.dat';
 %filename='Cylinder-r-0.5-l-0.1-grid-0.025.dat';
-%  filename='sphere-r-0.5-grid-0.01.dat';
+% filename='sphere-r-0.5-grid-0.01.dat';
 % filename='sphere-r-1-grid-0.1.dat';
 % filename='cube-l-1-w-1-grid-0.03.dat';
 %filename='Cylinder-r-0.3-l-0.5-grid-0.03.dat';
@@ -13,141 +31,69 @@ function calculate_3D
 % filename='TriangularPrism-d-1-h-1-l-0.2-grid-0.025.dat';
 %filename='Cylinder-r-1-l-0.1-grid-0.03.dat';
 % filename='dihedral-a-1-b-1-grid-0.03.dat';
-filename='cube-l-0.5-w-0.5-grid-0.05.dat';
-partfile={filename};
+%filename='cube-l-0.5-w-0.5-grid-0.05.dat';
+%filename='missile.dat';
+filename='dom-1.dat';
 
-%% 有几个变量其他函数计算的时候要用，声明为全局变量
-global nf;
-global fr0;
-global fn;
-global fA;
-global c;
-global lambda;
-c=3.0e+8;
-lambda=0.25;
+data_process(filename,fileformat);
 
-%% 
-np=1;
-ratio=1;
-ha=[1;0;0];
-ua=[0;0;1];
-la=cross(ua,ha);
-if abs(la)<.5
-    errordlg('坐标轴设置错误');
-    return;
-end
-
-vTmp=cell(1,np);
-fTmp=cell(1,np);
-nvTmp=zeros(1,np); %v代表节点
-nfTmp=zeros(1,np); %f代表面元
-for iPart=1:np
-fid=fopen(partfile{iPart});%file id
-    nvTmp(iPart)=0;%vertice number
-    nfTmp(iPart)=0;%facets number
-    while(~feof(fid))%end of file
-        str=fscanf(fid,'%s',1);%scan string
-        if(strcmp(str,'GRID*'))%if match GRID*
-            nvTmp(iPart)=nvTmp(iPart)+1;%vertices number plus
-            fscanf(fid,'%s',7);%scan useless string
-        elseif(strcmp(str,'CTRIA3'))%if match CATIA Triangle,3 vertice
-            nfTmp(iPart)=nfTmp(iPart)+1;%facets number plus
-            fscanf(fid,'%s',5);%useless string
-        end
-    end
-    vTmp{iPart}=zeros(nvTmp(iPart),3);
-    fTmp{iPart}=zeros(nfTmp(iPart),3);
-    ivT=0;
-    ifT=0;
-    frewind(fid);
-    while(~feof(fid))%end of file
-        str=fscanf(fid,'%s',1);%scan string
-        if(strcmp(str,'GRID*'))%if match GRID*
-            ivT=ivT+1;%vertices number plus
-            fscanf(fid,'%s',1);%scan useless string
-            vTmp{iPart}(ivT,[1,2])=fscanf(fid,'%f',2);%scan coordinate x,y
-            fscanf(fid,'%s',3);%useless string
-            vTmp{iPart}(ivT,3)=fscanf(fid,'%f',1);%scan coordinate z
-        elseif(strcmp(str,'CTRIA3'))%if match CATIA Triangle,3 vertice
-            ifT=ifT+1;%facets number plus
-            fscanf(fid,'%s',2);%useless string
-            fTmp{iPart}(ifT,:)=fscanf(fid,'%d',3);%indice of facet
-        end
-    end
-    fclose(fid);%close file
-end
-
-vertex=vTmp{1};
-facet=fTmp{1}; %每个面元的节点号
-mNumber=ones(sum(nfTmp),1);
-for iPart=2:np%deliminate same vertex
-    fTmp{iPart}=fTmp{iPart}+size(vertex,1);
-    for p2=nvTmp(iPart):-1:1
-        tmp=bsxfun(@minus,vTmp{iPart}(p2,:),vertex);
-        p1=find(dot(tmp,tmp,2)<myeps,1);
-        if p1
-            fTmp{iPart}(fTmp{iPart}==p2+size(vertex,1))=p1;
-            fTmp{iPart}(fTmp{iPart}>p2+size(vertex,1))=fTmp{iPart}(fTmp{iPart}>p2+size(vertex,1))-1;
-            vTmp{iPart}(p2,:)=[];
-            nvTmp(iPart)=nvTmp(iPart)-1;
-        end
-    end
-    vertex=[vertex;vTmp{iPart}];
-    facet=[facet;fTmp{iPart}];
-    mNumber(sum(nfTmp(1:iPart-1))+1:sum(nfTmp(1:iPart)))=iPart;
-end
-
-vertex=vertex*[ha,la,ua]*ratio; 
-nf=size(facet,1);
-nv=size(vertex,1);
-vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (面元编号，x/y/z，第几个点) 
-clear vTmp;
-clear fTmp;
-clear nXTmp;
-clear nFTmp;
-
-%% preprocess for PO
-fL=circshift(vertex,[0,0,-1])-vertex;%edge
-fr0=mean(vertex,3);%center, reference point
-frc=(circshift(vertex,[0,0,-1])+vertex)/2;% center point of edge
-fn=cross(fL(:,:,1),fL(:,:,2),2);%cross product
-fA=sqrt(dot(fn,fn,2))/2;%area of every facet
-fn=bsxfun(@rdivide,fn,2*fA);%normal
-%axes(handles.axes_mesh);
-fill3(permute(vertex(:,1,:),[3,1,2]),permute(vertex(:,2,:),[3,1,2]),permute(vertex(:,3,:),[3,1,2]),mNumber');
-%handles.normalline=line([fr0(:,1),fr0(:,1)+fn(:,1).*sqrt(fA)]',[fr0(:,2),fr0(:,2)+fn(:,2).*sqrt(fA)]',[fr0(:,3),fr0(:,3)+fn(:,3).*sqrt(fA)]','color','r','linewidth',2);
-axis equal tight;
-xlabel('x');
-ylabel('y');
-zlabel('z');
 
 %% draw picture
+if(theta_begin~=theta_end)
+    l_theta=theta_begin:step:theta_end;
+    l_sigma_Q_1=zeros(size(l_theta));
+    phi=phi_begin;
+    ii=0;
+    for theta= l_theta
+        ii=ii+1;
+        A=calc_A_3D(theta,phi);
 
-l_theta=0:0.01:pi/2;
-l_sigma_Q_1=zeros(size(l_theta));
-
-ii=0;
-
-for theta= l_theta
-    ii=ii+1;
-    A=calc_A_3D(theta,0);
-
-    G=calc_G_3D(theta,0);
-    fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
-                      ii,length(l_theta),A,G,G/A^2,G/A);
-    N_I_s= calc_3D_N_I_s_2(theta,0,theta,0);        
-    l_sigma_Q_1(ii)=20*log10(4*pi*A*N_I_s/G);
-    fprintf('N_I_s:%f  \n',N_I_s)
-    %l_sigma_Q_1(ii)=20*log10(calc_3D_N_I_s_2(theta,0,theta,0));
+        G=calc_G_3D(theta,phi);
+        fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
+                          ii,length(l_theta),A,G,G/A^2,G/A);
+        N_I_s= calc_3D_N_I_s_2(theta,phi,theta,phi);        
+        l_sigma_Q_1(ii)=10*log10(4*pi*A*N_I_s/G);
+        fprintf('N_I_s:%f  \n',N_I_s)
+        %l_sigma_Q_1(ii)=10*log10(calc_3D_N_I_s_2(theta,0,theta,0));
+    end
+    if(Is_plot~=0)
+        figure('Name',filename);
+        plot(l_theta,l_sigma_Q_1,'-*')
+        xlabel('\phi(rad)');
+        ylabel('QRCS(dB/m^2)');  
+        grid on
+    end 
+    filename=strrep(filename,'.dat','.mat');
+    save (filename,'l_theta','l_sigma_Q_1');
+    pause(1);
+    
+elseif(phi_begin~=phi_end)
+    l_phi=phi_begin:step:phi_end;
+    l_sigma_Q_1=zeros(size(l_phi));
+    theta=theta_begin;
+    ii=0;
+    for phi= l_phi
+        ii=ii+1;
+        A=calc_A_3D(theta,phi);
+        G=calc_G_3D(theta,phi);
+        fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
+                          ii,length(l_phi),A,G,G/A^2,G/A);
+        N_I_s= calc_3D_N_I_s_2(theta,phi,theta,phi);        
+        l_sigma_Q_1(ii)=10*log10(4*pi*A*N_I_s/G);
+        fprintf('N_I_s:%f  \n',N_I_s)
+        %l_sigma_Q_1(ii)=10*log10(calc_3D_N_I_s_2(theta,0,theta,0));
+    end
+    if(Is_plot~=0)
+        figure('Name',filename);
+        plot(l_phi,l_sigma_Q_1,'-*')
+        xlabel('\phi(rad)');
+        ylabel('QRCS(dB/m^2)');  
+        grid on
+    end 
+    filename=strrep(filename,'.dat','.mat');
+    save (filename,'l_phi','l_sigma_Q_1');
+    pause(1);
 end
-figure(2);
-plot(l_theta,l_sigma_Q_1,'-*')
-xlabel('\theta(rad)');
-ylabel('QRCS(dB/m^2)');  
-grid on
-filename=strrep(filename,'.dat','.mat');
-save (filename,'l_theta','l_sigma_Q_1');
-
 
 end
 
@@ -317,7 +263,136 @@ fprintf('     N: %d \n',N);
 end
 
 
+%% 数据读取与预处理
+function data_process(filename,fileformat)
 
+%cope for code.m
+
+%% 有几个变量其他函数计算的时候要用，声明为全局变量
+global nf;
+global fr0;
+global fn;
+global fA;
+global c;
+global lambda;
+global vertex;
+global mNumber;
+
+
+
+np=1;
+ratio=1;
+ha=[1;0;0];
+ua=[0;0;1];
+la=cross(ua,ha);
+if abs(la)<.5
+    errordlg('坐标轴设置错误');
+    return;
+end
+
+if(strcmp(fileformat,'catia'))
+%% 
+    partfile={filename};
+    vTmp=cell(1,np);
+    fTmp=cell(1,np);
+    nvTmp=zeros(1,np); %v代表节点
+    nfTmp=zeros(1,np); %f代表面元
+    for iPart=1:np
+    fid=fopen(partfile{iPart});%file id
+        nvTmp(iPart)=0;%vertice number
+        nfTmp(iPart)=0;%facets number
+        while(~feof(fid))%end of file
+            str=fscanf(fid,'%s',1);%scan string
+            if(strcmp(str,'GRID*'))%if match GRID*
+                nvTmp(iPart)=nvTmp(iPart)+1;%vertices number plus
+                fscanf(fid,'%s',7);%scan useless string
+            elseif(strcmp(str,'CTRIA3'))%if match CATIA Triangle,3 vertice
+                nfTmp(iPart)=nfTmp(iPart)+1;%facets number plus
+                fscanf(fid,'%s',5);%useless string
+            end
+        end
+        vTmp{iPart}=zeros(nvTmp(iPart),3);
+        fTmp{iPart}=zeros(nfTmp(iPart),3);
+        ivT=0;
+        ifT=0;
+        frewind(fid);
+        while(~feof(fid))%end of file
+            str=fscanf(fid,'%s',1);%scan string
+            if(strcmp(str,'GRID*'))%if match GRID*
+                ivT=ivT+1;%vertices number plus
+                fscanf(fid,'%s',1);%scan useless string
+                vTmp{iPart}(ivT,[1,2])=fscanf(fid,'%f',2);%scan coordinate x,y
+                fscanf(fid,'%s',3);%useless string
+                vTmp{iPart}(ivT,3)=fscanf(fid,'%f',1);%scan coordinate z
+            elseif(strcmp(str,'CTRIA3'))%if match CATIA Triangle,3 vertice
+                ifT=ifT+1;%facets number plus
+                fscanf(fid,'%s',2);%useless string
+                fTmp{iPart}(ifT,:)=fscanf(fid,'%d',3);%indice of facet
+            end
+        end
+        fclose(fid);%close file
+    end
+
+    vertex=vTmp{1};
+    facet=fTmp{1}; %每个面元的节点号
+    mNumber=ones(sum(nfTmp),1);
+    for iPart=2:np%deliminate same vertex
+        fTmp{iPart}=fTmp{iPart}+size(vertex,1);
+        for p2=nvTmp(iPart):-1:1
+            tmp=bsxfun(@minus,vTmp{iPart}(p2,:),vertex);
+            p1=find(dot(tmp,tmp,2)<myeps,1);
+            if p1
+                fTmp{iPart}(fTmp{iPart}==p2+size(vertex,1))=p1;
+                fTmp{iPart}(fTmp{iPart}>p2+size(vertex,1))=fTmp{iPart}(fTmp{iPart}>p2+size(vertex,1))-1;
+                vTmp{iPart}(p2,:)=[];
+                nvTmp(iPart)=nvTmp(iPart)-1;
+            end
+        end
+        vertex=[vertex;vTmp{iPart}];
+        facet=[facet;fTmp{iPart}];
+        mNumber(sum(nfTmp(1:iPart-1))+1:sum(nfTmp(1:iPart)))=iPart;
+    end
+
+    vertex=vertex*[ha,la,ua]*ratio; 
+    nf=size(facet,1);
+    nv=size(vertex,1);
+    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (面元编号，x/y/z，第几个点) 
+    clear vTmp;
+    clear fTmp;
+    clear nXTmp;
+    clear nFTmp;
+
+else
+    rawdata = read_gridpro(filename);
+    nv=int32(rawdata(1,1));
+    vertex=rawdata(2:nv+1,:);
+    nf=int32(nv+2);
+    facet=rawdata(nv+3:length(rawdata),:);
+
+    vertex=vertex*[ha,la,ua]*ratio; 
+    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (面元编号，x/y/z，第几个点) 
+
+end
+%% preprocess for PO
+fL=circshift(vertex,[0,0,-1])-vertex;%edge
+fr0=mean(vertex,3);%center, reference point
+frc=(circshift(vertex,[0,0,-1])+vertex)/2;% center point of edge
+fn=cross(fL(:,:,1),fL(:,:,2),2);%cross product
+fA=sqrt(dot(fn,fn,2))/2;%area of every facet
+fn=bsxfun(@rdivide,fn,2*fA);%normal
+
+global Is_plot;
+if(Is_plot~=0)
+    fill3(permute(vertex(:,1,:),[3,1,2]),permute(vertex(:,2,:),[3,1,2]),permute(vertex(:,3,:),[3,1,2]),3');
+    %handles.normalline=line([fr0(:,1),fr0(:,1)+fn(:,1).*sqrt(fA)]',[fr0(:,2),fr0(:,2)+fn(:,2).*sqrt(fA)]',[fr0(:,3),fr0(:,3)+fn(:,3).*sqrt(fA)]','color','r','linewidth',2);
+    axis equal tight;
+    xlabel('x');
+    ylabel('y');
+    zlabel('z');
+end
+fprintf('import data over');
+
+end
 
 
 
