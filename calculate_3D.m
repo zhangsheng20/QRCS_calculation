@@ -12,13 +12,16 @@ global mNumber;
 c=3.0e+8;
 lambda=0.25;
 Is_plot=1;
-step=0.1;
-theta_begin=pi/2;
-theta_end=pi/2;
-phi_begin=-pi/2;
-phi_end=pi/2;
-% fileformat='catia';
-fileformat='gridpro';
+   
+if(nargin<7)
+    step=0.1;
+    theta_begin=pi/2;
+    theta_end=pi/2;
+    phi_begin=-pi/2;
+    phi_end=pi/2;
+    % fileformat='catia';
+    fileformat='gridpro';
+end
 
 %cope for code.m
 %filename='.\cube_1m_1m_0.03m_.dat';
@@ -33,7 +36,9 @@ fileformat='gridpro';
 % filename='dihedral-a-1-b-1-grid-0.03.dat';
 %filename='cube-l-0.5-w-0.5-grid-0.05.dat';
 %filename='missile.dat';
-filename='dom-1.dat';
+if (nargin==0)
+    filename='C:\Users\Administrator\Desktop\quantum stealth\mygit\dom-1.dat';
+end
 
 data_process(filename,fileformat);
 
