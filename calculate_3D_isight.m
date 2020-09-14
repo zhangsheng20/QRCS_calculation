@@ -1,6 +1,6 @@
 
-%QRCS_program_path="C:\Users\Administrator\Desktop\quantum stealth\mygit";
-%ISIGHT_output_path="C:\Users\Administrator\Desktop\iSIGHT\output";
+%QRCS_program_path='C:\Users\Administrator\Desktop\QRCS_optimization_ws\QRCS_calculation';
+%ISIGHT_output_path='C:\Users\Administrator\Desktop\QRCS_optimization_ws\isight_missile_qrcs_optimization\output';
 %child_dirname=1;
 addpath(QRCS_program_path);
 my_str=num2str(child_dirname);
