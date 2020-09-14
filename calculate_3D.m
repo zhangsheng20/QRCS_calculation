@@ -1,5 +1,4 @@
-function calculate_3D(filename,step,theta_begin,theta_end,phi_begin,phi_end,fileformat)
-global Is_plot;
+function calculate_3D(filename,step,theta_begin,theta_end,phi_begin,phi_end,fileformat,Is_plot)
 global nf;
 global fr0;
 global fn;
@@ -11,7 +10,6 @@ global mNumber;
 
 c=3.0e+8;
 lambda=0.25;
-Is_plot=1;
    
 if(nargin<7)
     step=0.1;
@@ -21,6 +19,7 @@ if(nargin<7)
     phi_end=pi/2;
     % fileformat='catia';
     fileformat='gridpro';
+    Is_plot=1;
 end
 
 %cope for code.m
@@ -40,7 +39,7 @@ if (nargin==0)
     filename='C:\Users\Administrator\Desktop\quantum stealth\mygit\dom-1.dat';
 end
 
-data_process(filename,fileformat);
+data_process(filename,fileformat,Is_plot);
 
 
 %% draw picture
@@ -105,7 +104,7 @@ end
 
 %%
 function [ output ] = calc_3D_N_I_s_2( theta_s,phi_s,theta_d,phi_d )
-%¹«¹²Á¿
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 global c;
 global lambda;
@@ -146,7 +145,7 @@ end
 
 %% 
 function [ G ] = calc_G_3D(theta_s,phi_s)
-%Çó½â·ÖÄ¸
+%ï¿½ï¿½ï¿½ï¿½Ä¸
 
 d_theta=0.03;
 d_phi=0.2; % if this value larger than 0.03  the result will be influented
@@ -165,7 +164,7 @@ end
 
 %% 
 function [ A ] = calc_A_3D(theta_s,phi_s)
-%Çó½âÕÕÉäÕý½»Ãæ»ý
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 global lambda;
 r=100000000*lambda;
 r_s=[r*sin(theta_s)*cos(phi_s),r*sin(theta_s)*sin(phi_s),r*cos(theta_s)];
@@ -181,7 +180,7 @@ end
 
 %% 
 function [ output ] = calc_3D_I_s( theta_s,phi_s,theta_d,phi_d )
-%¹«¹²Á¿
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 c=3.0e+8;
@@ -201,12 +200,12 @@ else
     r_d=r_s;
 end
 for ii=1:1:nf
-    if (dot(r_s,fn(ii,:))/r>0) &&  (dot(r_d,fn(ii,:))/r>0) %±»ÕÕÉäµ½µÄ¹â×Ó
+    if (dot(r_s,fn(ii,:))/r>0) &&  (dot(r_d,fn(ii,:))/r>0) %ï¿½ï¿½ï¿½ï¿½ï¿½äµ½ï¿½Ä¹ï¿½ï¿½ï¿½
     %handles.normalline=line([fr0(ii,1),fr0(ii,1)+fn(ii,1)]',[fr0(ii,2),fr0(ii,2)+fn(ii,2)]',[fr0(ii,3),fr0(ii,3)+fn(ii,3)]','color','r','linewidth',2);
     %if fr0(ii,3)>0.999
         ri_x=fr0(ii,1);
         ri_y=fr0(ii,2);
-        ri_z=fr0(ii,3);%fr0 ±íÊ¾ÃæÔªµÄÖÐÐÄ×ø±ê
+        ri_z=fr0(ii,3);%fr0 ï¿½ï¿½Ê¾ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if(nargin==2)
             Delta_Ri=2*sqrt(((ri_x-r.*sin(theta_s).*cos(phi_s)).^2+(ri_y-r.*sin(theta_s).*sin(phi_s)).^2+(ri_z-r.*cos(theta_s)).^2));     
         else
@@ -223,7 +222,7 @@ end
 
 %% 
 function [ output ] = calc_3D_N_I_s( theta_s,phi_s,theta_d,phi_d )
-%¹«¹²Á¿
+%ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 global c;
 global lambda;
@@ -248,11 +247,11 @@ for ii=1:1:nf
   a=dot(r_s,fn(ii,:))/r;
   b=dot(r_d,fn(ii,:))/r;
   %fprintf(' %d:a=%f,b=%f \n',ii,a,b); 
-   if (a>0.1) &&  (b>0.1)  && fn(ii,3)>0.5         %±»ÕÕÉäµ½µÄÔ­×Ó
+   if (a>0.1) &&  (b>0.1)  && fn(ii,3)>0.5         %ï¿½ï¿½ï¿½ï¿½ï¿½äµ½ï¿½ï¿½Ô­ï¿½ï¿½
      %line([fr0(ii,1),fr0(ii,1)+fn(ii,1)*0.1]',[fr0(ii,2),fr0(ii,2)+fn(ii,2)*0.1]',[fr0(ii,3),fr0(ii,3)+fn(ii,3)*0.1]','color','r','linewidth',1);  
         ri_x=fr0(ii,1);
         ri_y=fr0(ii,2);
-        ri_z=fr0(ii,3);%fr0 ±íÊ¾ÃæÔªµÄÖÐÐÄ×ø±ê
+        ri_z=fr0(ii,3);%fr0 ï¿½ï¿½Ê¾ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if(nargin==2)
             Delta_Ri=2*sqrt(((ri_x-r.*sin(theta_s).*cos(phi_s)).^2+(ri_y-r.*sin(theta_s).*sin(phi_s)).^2+(ri_z-r.*cos(theta_s)).^2));     
         else
@@ -268,12 +267,12 @@ fprintf('     N: %d \n',N);
 end
 
 
-%% Êý¾Ý¶ÁÈ¡ÓëÔ¤´¦Àí
-function data_process(filename,fileformat)
+%% ï¿½ï¿½ï¿½Ý¶ï¿½È¡ï¿½ï¿½Ô¤ï¿½ï¿½ï¿½ï¿½
+function data_process(filename,fileformat,Is_plot)
 
 %cope for code.m
 
-%% ÓÐ¼¸¸ö±äÁ¿ÆäËûº¯Êý¼ÆËãµÄÊ±ºòÒªÓÃ£¬ÉùÃ÷ÎªÈ«¾Ö±äÁ¿
+%% ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ÎªÈ«ï¿½Ö±ï¿½ï¿½ï¿?
 global nf;
 global fr0;
 global fn;
@@ -287,11 +286,11 @@ global mNumber;
 
 np=1;
 ratio=1;
-ha=[1;0;0];
-ua=[0;0;1];
+ha=[0;1;0];
+ua=[-1;0;0];
 la=cross(ua,ha);
 if abs(la)<.5
-    errordlg('×ø±êÖáÉèÖÃ´íÎó');
+    errordlg('ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½');
     return;
 end
 
@@ -300,8 +299,8 @@ if(strcmp(fileformat,'catia'))
     partfile={filename};
     vTmp=cell(1,np);
     fTmp=cell(1,np);
-    nvTmp=zeros(1,np); %v´ú±í½Úµã
-    nfTmp=zeros(1,np); %f´ú±íÃæÔª
+    nvTmp=zeros(1,np); %vï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½
+    nfTmp=zeros(1,np); %fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôª
     for iPart=1:np
     fid=fopen(partfile{iPart});%file id
         nvTmp(iPart)=0;%vertice number
@@ -339,7 +338,7 @@ if(strcmp(fileformat,'catia'))
     end
 
     vertex=vTmp{1};
-    facet=fTmp{1}; %Ã¿¸öÃæÔªµÄ½ÚµãºÅ
+    facet=fTmp{1}; %Ã¿ï¿½ï¿½ï¿½ï¿½Ôªï¿½Ä½Úµï¿½ï¿?
     mNumber=ones(sum(nfTmp),1);
     for iPart=2:np%deliminate same vertex
         fTmp{iPart}=fTmp{iPart}+size(vertex,1);
@@ -361,7 +360,7 @@ if(strcmp(fileformat,'catia'))
     vertex=vertex*[ha,la,ua]*ratio; 
     nf=size(facet,1);
     nv=size(vertex,1);
-    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (ÃæÔª±àºÅ£¬x/y/z£¬µÚ¼¸¸öµã) 
+    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (ï¿½ï¿½Ôªï¿½ï¿½Å£ï¿½x/y/zï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½ï¿½) 
     clear vTmp;
     clear fTmp;
     clear nXTmp;
@@ -375,7 +374,7 @@ else
     facet=rawdata(nv+3:length(rawdata),:);
 
     vertex=vertex*[ha,la,ua]*ratio; 
-    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (ÃæÔª±àºÅ£¬x/y/z£¬µÚ¼¸¸öµã) 
+    vertex=cat(3,vertex(facet(:,1),:),vertex(facet(:,2),:),vertex(facet(:,3),:));%point (ï¿½ï¿½Ôªï¿½ï¿½Å£ï¿½x/y/zï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½ï¿½) 
 
 end
 %% preprocess for PO
@@ -386,7 +385,6 @@ fn=cross(fL(:,:,1),fL(:,:,2),2);%cross product
 fA=sqrt(dot(fn,fn,2))/2;%area of every facet
 fn=bsxfun(@rdivide,fn,2*fA);%normal
 
-global Is_plot;
 if(Is_plot~=0)
     fill3(permute(vertex(:,1,:),[3,1,2]),permute(vertex(:,2,:),[3,1,2]),permute(vertex(:,3,:),[3,1,2]),3');
     %handles.normalline=line([fr0(:,1),fr0(:,1)+fn(:,1).*sqrt(fA)]',[fr0(:,2),fr0(:,2)+fn(:,2).*sqrt(fA)]',[fr0(:,3),fr0(:,3)+fn(:,3).*sqrt(fA)]','color','r','linewidth',2);
