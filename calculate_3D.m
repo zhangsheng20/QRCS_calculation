@@ -63,7 +63,7 @@ if(theta_begin~=theta_end)
     if(Is_plot~=0)
         figure('Name',filename);
         plot(l_theta,l_sigma_Q_1,'-*')
-        xlabel('\phi(rad)');
+        xlabel('\theta(rad)');
         ylabel('QRCS(dB/m^2)');  
         grid on
     end 
@@ -131,7 +131,7 @@ end
 
 a=fn*r_s'/r;
 b=fn*r_d'/r;
-mask=(a>0.08) &  (b>0.08); %& fn(:,3)>0.5;
+mask=(a>0.00) &  (b>0.00); %& fn(:,3)>0.5;
 d=exp(1.00000i*omega*Mat_Delta_Ri/c).*fA.*mask;
 allsum=sum(d);
 output=(abs(allsum)).^2;
@@ -148,7 +148,7 @@ function [ G ] = calc_G_3D(theta_s,phi_s)
 %����ĸ
 
 d_theta=0.03;
-d_phi=0.2; % if this value larger than 0.03  the result will be influented
+d_phi=0.03; % if this value larger than 0.03  the result will be influented
 
 G=0;
 cnt=0;
@@ -166,7 +166,7 @@ end
 function [ A ] = calc_A_3D(theta_s,phi_s)
 %��������������
 global lambda;
-r=100000000*lambda;
+r=10000*lambda;
 r_s=[r*sin(theta_s)*cos(phi_s),r*sin(theta_s)*sin(phi_s),r*cos(theta_s)];
 global fn;
 global fA;
@@ -286,8 +286,8 @@ global mNumber;
 
 np=1;
 ratio=1;
-ha=[0;1;0];
-ua=[-1;0;0];
+ha=[1;0;0];
+ua=[0;0;1];
 la=cross(ua,ha);
 if abs(la)<.5
     errordlg('���������ô���');

@@ -1,13 +1,13 @@
 
 function test_code
-test004();
+test008();
 end
 
 %%  随phi的变化  二面角数值解
 function test009
 
 if ~exist('dihedral.mat')
-    l_phi=-pi/2:0.1:pi/2;
+    l_phi=-pi/2:0.01:pi/2;
     l_sigma_Q_1=zeros(size(l_phi));
     l_sigma_Q_2=zeros(size(l_phi));
     
@@ -17,9 +17,9 @@ if ~exist('dihedral.mat')
         A=1*sqrt(2)*cos(theta-pi/2);
 %         G=calc_G(theta,phi,'dihedral');
         G=1;
-%         l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,phi,'dihedral',theta,phi)/G);
+%         l_sigma_Q_1(ii)=10*log10(4*pi*A*calc_N_I_s(theta,phi,'dihedral',theta,phi)/G);
         l_sigma_Q_2(ii)=G;
-        l_sigma_Q_1(ii)=20*log10(calc_N_I_s(theta,phi,'dihedral',theta,phi));
+        l_sigma_Q_1(ii)=10*log10(calc_N_I_s(theta,phi,'dihedral',theta,phi));
         fprintf('%d\\%d   G:%f\n',ii,length(l_phi),G);
         ii=ii+1;
     end
@@ -48,9 +48,9 @@ if ~exist('dihedral.mat')
         A=1*sqrt(2)*cos(theta-pi/2);
 %         G=calc_G(theta,0,'dihedral');
         G=1;
-%         l_sigma_Q_1(ii)=20*log10(4*pi*A*calc_N_I_s(theta,0,'dihedral',theta,0)/G);
+%         l_sigma_Q_1(ii)=10*log10(4*pi*A*calc_N_I_s(theta,0,'dihedral',theta,0)/G);
 %         l_sigma_Q_1(ii)=G;
-        l_sigma_Q_1(ii)=20*log10(calc_N_I_s(theta,0,'dihedral',theta,0))-170;
+        l_sigma_Q_1(ii)=10*log10(calc_N_I_s(theta,0,'dihedral',theta,0))-85;
         fprintf('%d\\%d   G:%f\n',ii,length(l_theta),G);
         ii=ii+1;
     end
@@ -74,6 +74,7 @@ hold on
 test005('circle');
 legend('数值解','理论解','Location','northeast')
 hold on
+ xlim([-1.5, 1.5]);
 % ylim([-5, 5]);
 grid on
 end
@@ -106,12 +107,12 @@ for theta=l_theta
 end
 
 
- plot(l_theta,20*log10(sigma_Q_1),'-*',l_theta,20*log10(sigma_Q_2),'-*');
+ plot(l_theta,10*log10(sigma_Q_1),'-*',l_theta,10*log10(sigma_Q_2),'-*');
  value_mean1=mean(sigma_Q_1);
- fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  20*log10(abs(value_mean1))  );
+ fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  10*log10(abs(value_mean1))  );
  value_mean2=mean(sigma_Q_2);
- fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  20*log10(abs(value_mean2))  );
- fprintf('均值差：%f dB \n',20*log10(abs(value_mean1))-20*log10(abs(value_mean2)));
+ fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  10*log10(abs(value_mean2))  );
+ fprintf('均值差：%f dB \n',10*log10(abs(value_mean1))-10*log10(abs(value_mean2)));
 
 end
 
@@ -141,13 +142,13 @@ for theta=l_theta
         ii=ii+1; 
     end    
 end
- plot(l_theta,20*log10(sigma_Q_1),'-*',l_theta,20*log10(sigma_Q_2),'-*');
+ plot(l_theta,10*log10(sigma_Q_1),'-*',l_theta,10*log10(sigma_Q_2),'-*');
  value_mean1=mean(sigma_Q_1);
- fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  20*log10(abs(value_mean1))  );
+ fprintf('数值解均值:%f  = %f dB  \n',value_mean1,  10*log10(abs(value_mean1))  );
  
  value_mean2=mean(sigma_Q_2);
- fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  20*log10(abs(value_mean2))  );
- fprintf('均值差：%f dB \n',20*log10(abs(value_mean1))-20*log10(abs(value_mean2)));
+ fprintf('理论解解均值:%f  = %f dB  \n',value_mean2,  10*log10(abs(value_mean2))  );
+ fprintf('均值差：%f dB \n',10*log10(abs(value_mean1))-10*log10(abs(value_mean2)));
 
 end
 
@@ -162,7 +163,7 @@ l_sigma_Q_1=zeros(size(l_theta));
 ii=0;
 for theta= l_theta
     ii=ii+1;
-    l_sigma_Q_1(ii)=20*log10(calc_sigma_Q(theta,shape));
+    l_sigma_Q_1(ii)=10*log10(calc_sigma_Q(theta,shape));
 end
 plot(l_theta,l_sigma_Q_1,'-*')
 xlabel('\theta(rad)');
@@ -173,16 +174,16 @@ end
 %% 绘制 数值解
 function test004
 % load('cube-l-1-w-1-grid-0.05.mat');
-% load('Cylinder-r-1-l-0.5-grid-0.1.mat');
+%   load('Cylinder-r-1-l-0.5-grid-0.1.mat');
 % load('sphere-r-0.5-grid-0.025.mat');
 % load('TriangularPrism-d-1-h-1-l-0.2-grid-0.1.mat');
 % load('cube-l-1-w-1-grid-0.05.mat');
 % load('sphere-r-0.5-grid-0.025.mat');
 %  load('TriangularPrism-d-1-h-1-l-0.2-grid-0.025.mat')
-% load('Cylinder-r-1-l-0.1-grid-0.03.mat')
-load('cube-l-0.5-w-0.5-grid-0.05.mat')
+%   load('Cylinder-r-1-l-0.1-grid-0.03.mat')
+%load('cube-l-0.5-w-0.5-grid-0.05.mat')
 
-plot(l_theta,l_sigma_Q_1,'-*')
+plot(l_theta,l_sigma_Q_1/2,'-*')
 xlabel('\theta(rad)');
 ylabel('QRCS(dB/m^2)'); 
 grid on;
@@ -199,7 +200,7 @@ l_sigma_Q_2=zeros(size(l_theta));
 ii=0;
 for theta= l_theta
     ii=ii+1;
-    l_sigma_Q_2(ii)=20*log10(pi*0.5*0.5);
+    l_sigma_Q_2(ii)=10*log10(pi*0.5*0.5);
 end
 plot(l_theta,l_sigma_Q_2,'-*')
 xlabel('\theta(rad)');
