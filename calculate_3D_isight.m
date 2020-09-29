@@ -4,8 +4,8 @@
 %child_dirname=1;
 clear;
 grid_size=0.01;
-fileformat='gridpro';
-% fileformat='catia';
+% fileformat='gridpro';
+fileformat='catia';
 if(exist('child_dirname','var')==0)
    child_dirname='sphere-r-0.5';
 end

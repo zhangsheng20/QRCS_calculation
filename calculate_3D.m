@@ -39,8 +39,7 @@ if (nargin==0)
     filename='C:\Users\Administrator\Desktop\quantum stealth\mygit\dom-1.dat';
 end
 
-data_process(filename,fileformat,Is_plot);
-
+[nf,fr0,fn,fA,vertex,mNumber]=data_process(filename,fileformat,Is_plot);
 
 %% draw picture
 if(theta_begin~=theta_end)
@@ -55,7 +54,7 @@ if(theta_begin~=theta_end)
         G=calc_G_3D(theta,phi);
         fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
                           ii,length(l_theta),A,G,G/A^2,G/A);
-        N_I_s= calc_3D_N_I_s_2(theta,phi,theta,phi);        
+        N_I_s= calc_3D_N_I_s_3(theta,phi,theta,phi);        
         l_sigma_Q_1(ii)=10*log10(4*pi*A*N_I_s/G);
         fprintf('N_I_s:%f  \n',N_I_s)
         %l_sigma_Q_1(ii)=10*log10(calc_3D_N_I_s_2(theta,0,theta,0));
@@ -110,7 +109,7 @@ global c;
 global lambda;
 omega=2*pi*c/lambda;
 r=100000*lambda;
- 
+
 global fr0;
 global fn;
 global fA;
@@ -140,8 +139,42 @@ output=(abs(allsum)).^2;
 % fprintf('     N: %d \n',N);
 end
 
+function [ output ] = calc_3D_N_I_s_3( theta_s,phi_s,theta_d,phi_d )
+%method in Theoretical and computational analysis of the quantum radar cross section for simple geometrical targets
 
+global lambda;
+k=2*pi/lambda;
+ 
+global fr0;
+global fn;
+global fA;
 
+vk=[k*sin(theta_s)*cos(phi_s),k*sin(theta_s)*sin(phi_s),k*cos(theta_s)];
+if(nargin==4)
+  vk_=[k*sin(theta_d)*cos(phi_d),k*sin(theta_d)*sin(phi_d),k*cos(theta_d)];
+else
+    vk_=vk;
+end
+
+if(nargin==2)
+    Mat_Delta_Ri=2*(fr0(:,1)*k*sin(theta_s)*cos(phi_s)+fr0(:,2)*k*sin(theta_s)*sin(phi_s)+fr0(:,3)*k*cos(theta_s));
+else
+    Mat_Delta_Ri=fr0(:,1)*k*(sin(theta_s).*cos(phi_s)+sin(theta_d)*cos(phi_d))...
+        +fr0(:,2)*k*(sin(theta_s)*sin(phi_s)+sin(theta_d)*sin(phi_d))...
+        +fr0(:,3)*k*(cos(theta_s)+cos(theta_d));
+
+end
+
+a=fn*vk'/k;
+b=fn*vk_'/k;
+mask=(a>0.00) &  (b>0.00); %& fn(:,3)>0.5;
+d=exp(1.0i*Mat_Delta_Ri).*fA.*mask;
+allsum=sum(d);
+output=(abs(allsum)).^2;
+
+% N=sum(mask);
+% fprintf('     N: %d \n',N);
+end
 
 %% 
 function [ G ] = calc_G_3D(theta_s,phi_s)
@@ -155,7 +188,7 @@ cnt=0;
 for theta_d=0:d_theta:pi
     for phi_d=0:d_phi:2*pi
         cnt=cnt+1;
-        G=G+sin(theta_d)*calc_3D_N_I_s_2( theta_s,phi_s,theta_d,phi_d);  
+        G=G+sin(theta_d)*calc_3D_N_I_s_3( theta_s,phi_s,theta_d,phi_d);  
     end
 end
 G=G*d_phi*d_theta;
@@ -268,21 +301,11 @@ end
 
 
 %% ���ݶ�ȡ��Ԥ����
-function data_process(filename,fileformat,Is_plot)
+function[nf,fr0,fn,fA,vertex,mNumber]= data_process(filename,fileformat,Is_plot)
 
 %cope for code.m
 
 %% �м��������������������ʱ��Ҫ�ã�����Ϊȫ�ֱ���?
-global nf;
-global fr0;
-global fn;
-global fA;
-global c;
-global lambda;
-global vertex;
-global mNumber;
-
-
 
 np=1;
 ratio=1;
