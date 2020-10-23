@@ -1,4 +1,4 @@
-function calculate_3D(filename,step,theta_begin,theta_end,phi_begin,phi_end,fileformat,Is_plot)
+function[output]= calculate_3D(filename,frequency_G,step,theta_begin,theta_end,phi_begin,phi_end,fileformat,Is_plot)
 global nf;
 global fr0;
 global fn;
@@ -6,10 +6,12 @@ global fA;
 global c;
 global lambda;
 global vertex;
-global mNumber;
 
 c=3.0e+8;
-lambda=0.25;
+if(~isa(frequency_G,'double'))
+    lambda=c/(frequency_G*10^9);
+end
+% lambda=0.25;
    
 if(nargin<7)
     step=0.1;
@@ -39,7 +41,7 @@ if (nargin==0)
     filename='C:\Users\Administrator\Desktop\quantum stealth\mygit\dom-1.dat';
 end
 
-[nf,fr0,fn,fA,vertex,mNumber]=data_process(filename,fileformat,Is_plot);
+[nf,fr0,fn,fA,vertex]=data_process(filename,fileformat,Is_plot);
 
 %% draw picture
 if(theta_begin~=theta_end)
@@ -56,7 +58,7 @@ if(theta_begin~=theta_end)
                           ii,length(l_theta),A,G,G/A^2,G/A);
         N_I_s= calc_3D_N_I_s_3(theta,phi,theta,phi);        
         l_sigma_Q_1(ii)=10*log10(4*pi*A*N_I_s/G);
-        fprintf('N_I_s:%f  \n',N_I_s)
+        fprintf('N_I_s:%11.10f         \n',N_I_s)
         %l_sigma_Q_1(ii)=10*log10(calc_3D_N_I_s_2(theta,0,theta,0));
     end
     if(Is_plot~=0)
@@ -81,9 +83,9 @@ elseif(phi_begin~=phi_end)
         G=calc_G_3D(theta,phi);
         fprintf('progress: %d \\ %d  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
                           ii,length(l_phi),A,G,G/A^2,G/A);
-        N_I_s= calc_3D_N_I_s_2(theta,phi,theta,phi);        
+        N_I_s= calc_3D_N_I_s_3(theta,phi,theta,phi);        
         l_sigma_Q_1(ii)=10*log10(4*pi*A*N_I_s/G);
-        fprintf('N_I_s:%f  \n',N_I_s)
+        fprintf('N_I_s:%8.7f  \n',N_I_s)
         %l_sigma_Q_1(ii)=10*log10(calc_3D_N_I_s_2(theta,0,theta,0));
     end
     if(Is_plot~=0)
@@ -96,6 +98,22 @@ elseif(phi_begin~=phi_end)
     filename=strrep(filename,'.dat','.mat');
     save (filename,'l_phi','l_sigma_Q_1');
     pause(1);
+    
+elseif(phi_begin==phi_end && theta_begin==theta_end)
+    ii=0;
+    output=zeros(size(frequency_G));
+    for frequency=frequency_G
+        ii=ii+1;
+        lambda=c/(frequency*10^9);
+        k=2*pi/lambda;
+         A=calc_A_3D(theta_begin,phi_begin);
+        G=calc_G_3D(theta_begin,phi_begin);
+        fprintf('%d \\ %d  f:%f  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
+                          ii,length(frequency_G),frequency,A,G,G/A^2,G/A);
+%         N_I_s= calc_3D_N_I_s_3(theta_begin,phi_begin,theta_begin,phi_begin);        
+%         output(ii)=G/((4*pi*(2*pi*0.1/k)^2));
+        output(ii)=G;
+    end
 end
 
 end
@@ -301,7 +319,7 @@ end
 
 
 %% ���ݶ�ȡ��Ԥ����
-function[nf,fr0,fn,fA,vertex,mNumber]= data_process(filename,fileformat,Is_plot)
+function[nf,fr0,fn,fA,vertex]= data_process(filename,fileformat,Is_plot)
 
 %cope for code.m
 
