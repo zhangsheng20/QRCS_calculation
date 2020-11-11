@@ -7,11 +7,16 @@ global c;
 global lambda;
 global vertex;
 
+
 c=3.0e+8;
-if(~isa(frequency_G,'double'))
-    lambda=c/(frequency_G*10^9);
+if(~isscalar(frequency_G))
+    lambda=c./(frequency_G*10^9);
+else
+   lambda=0.1;  
+   frequency_G=1.2;
 end
-% lambda=0.25;
+
+
    
 if(nargin<7)
     step=0.1;
@@ -38,7 +43,7 @@ end
 %filename='cube-l-0.5-w-0.5-grid-0.05.dat';
 %filename='missile.dat';
 if (nargin==0)
-    filename='C:\Users\Administrator\Desktop\quantum stealth\mygit\dom-1.dat';
+    filename='model\sphere-r-0.1\sphere-r-0.1-grid-0.01-gridpro.dat';
 end
 
 [nf,fr0,fn,fA,vertex]=data_process(filename,fileformat,Is_plot);
@@ -106,13 +111,13 @@ elseif(phi_begin==phi_end && theta_begin==theta_end)
         ii=ii+1;
         lambda=c/(frequency*10^9);
         k=2*pi/lambda;
-         A=calc_A_3D(theta_begin,phi_begin);
+        A=calc_A_3D(theta_begin,phi_begin);
         G=calc_G_3D(theta_begin,phi_begin);
-        fprintf('%d \\ %d  f:%f  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
-                          ii,length(frequency_G),frequency,A,G,G/A^2,G/A);
-%         N_I_s= calc_3D_N_I_s_3(theta_begin,phi_begin,theta_begin,phi_begin);        
+%         fprintf('%d \\ %d  f:%f  A:%f   G:%f  G/A^2:%f  G/A:%f  \n', ...
+%                           ii,length(frequency_G),frequency,A,G,G/A^2,G/A);
+         N_I_s= calc_3D_N_I_s_3(theta_begin,phi_begin,theta_begin,phi_begin);        
 %         output(ii)=G/((4*pi*(2*pi*0.1/k)^2));
-        output(ii)=G;
+        output(ii)=N_I_s;
     end
 end
 
@@ -201,10 +206,15 @@ function [ G ] = calc_G_3D(theta_s,phi_s)
 d_theta=0.03;
 d_phi=0.03; % if this value larger than 0.03  the result will be influented
 
+l_theta_d=linspace(0,pi,pi/0.03);
+l_theta_d(end)=[];
+l_phi_d=linspace(0,2*pi,2*pi/0.03);
+l_phi_d(end)=[];
+
 G=0;
 cnt=0;
-for theta_d=0:d_theta:pi
-    for phi_d=0:d_phi:2*pi
+for theta_d=l_theta_d
+    for phi_d=l_phi_d
         cnt=cnt+1;
         G=G+sin(theta_d)*calc_3D_N_I_s_3( theta_s,phi_s,theta_d,phi_d);  
     end
@@ -217,10 +227,11 @@ end
 function [ A ] = calc_A_3D(theta_s,phi_s)
 %��������������
 global lambda;
-r=10000*lambda;
-r_s=[r*sin(theta_s)*cos(phi_s),r*sin(theta_s)*sin(phi_s),r*cos(theta_s)];
 global fn;
 global fA;
+r=10000*lambda;
+r_s=[r*sin(theta_s)*cos(phi_s),r*sin(theta_s)*sin(phi_s),r*cos(theta_s)];
+
 
 a=fn*r_s';
 mask=a>0;

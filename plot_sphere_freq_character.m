@@ -23,7 +23,7 @@ end
 plot(l_ka,l_NIs,'-')
 
  
- grid_size=0.0025;
+grid_size=0.001;
 fileformat='gridpro';
 % fileformat='catia';
 child_dirname='sphere-r-0.1';
@@ -63,6 +63,7 @@ plot(l_ka,l_NIs-l_G,'-')
 xlabel('ka');
 ylabel('(dB/m^2)');  
 legend('NIs','G','NIs/G','Location','northeast')
+grid on;
 
 
 
